@@ -1,35 +1,68 @@
 <!doctype html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Walk In Tattoo | Waitlist Preview</title>
-<style>
-:root{font-family:system-ui,-apple-system,Arial,sans-serif;color:#191919;background:#f7f7f7}*{box-sizing:border-box}body{margin:0}main{max-width:560px;margin:auto;padding:28px 18px 60px}.brand{text-align:center;font-size:14px;letter-spacing:.16em;font-weight:800;margin-bottom:20px}.eyebrow{text-align:center;color:#666;font-size:13px;text-transform:uppercase;letter-spacing:.12em}h1{text-align:center;font-size:32px;margin:8px 0 8px}.intro{text-align:center;color:#555;margin:0 0 24px}.notice{background:#fff4d6;border:1px solid #d4b866;padding:12px;border-radius:10px;font-size:14px;margin-bottom:22px}.options{display:grid;gap:10px}.option{display:flex;align-items:center;gap:12px;text-align:left;background:#fff;border:2px solid #ddd;border-radius:12px;padding:15px;width:100%;font:inherit;cursor:pointer}.option[aria-pressed=true]{border-color:#222;background:#f0f0f0}.symbol{display:grid;place-items:center;width:46px;height:46px;border-radius:9px;background:#e7e7e7;font-size:23px;flex-shrink:0}.copy{flex:1}.name{display:block;font-weight:750;font-size:17px}.desc{display:block;font-size:13px;color:#555;margin-top:4px}.check{font-size:20px}.fields{margin-top:24px}label{display:block;font-weight:650;margin:14px 0 6px}input{width:100%;font:inherit;border:1px solid #bbb;background:white;border-radius:9px;padding:14px}button.submit{width:100%;margin-top:22px;padding:16px;border:0;border-radius:10px;background:#222;color:white;font:inherit;font-weight:700;opacity:.55;cursor:not-allowed}.foot{text-align:center;color:#777;font-size:12px;margin-top:18px}
-</style>
-</head>
-<body>
-<main>
-<div class="brand">WALK IN TATTOO · BOISE</div>
-<div class="eyebrow">Customer waitlist</div>
-<h1>Join the line</h1>
-<p class="intro">Choose your service and enter your details.</p>
-<div class="notice" role="status"><strong>Preview only:</strong> The waitlist is not accepting signups yet. No customer details will be submitted or saved.</div>
-<h2>Select service</h2>
-<div class="options" id="options" role="group" aria-label="Select service">
-<button type="button" class="option" aria-pressed="false" data-service="Buddy piercings"><span class="symbol">BP</span><span class="copy"><span class="name">Buddy piercings</span><span class="desc">$10 per person, groups of 2 or more</span></span><span class="check" aria-hidden="true"></span></button>
-<button type="button" class="option" aria-pressed="false" data-service="Custom tattoo"><span class="symbol">✍</span><span class="copy"><span class="name">Custom tattoo</span><span class="desc">Any tattoo that is not on the wall or a GWYG game</span></span><span class="check" aria-hidden="true"></span></button>
-<button type="button" class="option" aria-pressed="false" data-service="Get what you get games"><span class="symbol">🎲</span><span class="copy"><span class="name">Get what you get games</span><span class="desc">We have 19 themed GWYG games at fixed price points</span></span><span class="check" aria-hidden="true"></span></button>
-<button type="button" class="option" aria-pressed="false" data-service="Piercing"><span class="symbol">✦</span><span class="copy"><span class="name">Piercing</span><span class="desc">Lobes, conch, tragus, nostril, helix, nipples, navel and more</span></span><span class="check" aria-hidden="true"></span></button>
-<button type="button" class="option" aria-pressed="false" data-service="Wall flash"><span class="symbol">⚡</span><span class="copy"><span class="name">Wall flash</span><span class="desc">All wall flash 1/2 off our regular rates</span></span><span class="check" aria-hidden="true"></span></button>
-</div>
-<div class="fields"><label for="customer-name">Your name</label><input id="customer-name" autocomplete="name" placeholder="First name and last initial"><label for="phone">Phone number</label><input id="phone" type="tel" autocomplete="tel" inputmode="tel" placeholder="(208) 555-0123"></div>
-<button class="submit" type="button" disabled>Join waitlist — coming soon</button>
-<p class="foot">The live queue position will appear after signup is securely enabled.</p>
-</main>
-<script>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Walk In Tattoo | Join the Line</title>
+<style>:root{font-family:system-ui,-apple-system,Arial,sans-serif;color:#191919;background:#f7f7f7}*{box-sizing:border-box}body{margin:0}main{max-width:560px;margin:auto;padding:28px 18px 60px}.brand{text-align:center;font-size:14px;letter-spacing:.16em;font-weight:800;margin-bottom:20px}.eyebrow{text-align:center;color:#666;font-size:13px;text-transform:uppercase;letter-spacing:.12em}h1{text-align:center;font-size:32px;margin:8px 0}.intro{text-align:center;color:#555;margin:0 0 24px}.notice{background:#fff4d6;border:1px solid #d4b866;padding:12px;border-radius:10px;font-size:14px;margin-bottom:22px}.options{display:grid;gap:10px}.option{display:flex;align-items:center;gap:12px;text-align:left;background:#fff;border:2px solid #ddd;border-radius:12px;padding:15px;width:100%;font:inherit;cursor:pointer}.option[aria-pressed=true]{border-color:#222;background:#f0f0f0}.symbol{display:grid;place-items:center;width:46px;height:46px;border-radius:9px;background:#e7e7e7;font-size:23px;flex-shrink:0}.copy{flex:1}.name{display:block;font-weight:750;font-size:17px}.desc{display:block;font-size:13px;color:#555;margin-top:4px}.check{font-size:20px}.fields{margin-top:24px}label{display:block;font-weight:650;margin:14px 0 6px}input,select{width:100%;font:inherit;border:1px solid #bbb;background:white;border-radius:9px;padding:14px}.submit{width:100%;margin-top:22px;padding:16px;border:0;border-radius:10px;background:#222;color:white;font:inherit;font-weight:700;cursor:pointer}.submit:disabled{opacity:.5;cursor:not-allowed}.foot{text-align:center;color:#777;font-size:12px;margin-top:18px}.hidden{display:none}.success{background:white;padding:24px;border-radius:14px;text-align:center}.position{font-size:68px;font-weight:850;margin:12px 0}.error{color:#a00000;font-size:14px;margin-top:12px}</style></head>
+<body><main><div class="brand">WALK IN TATTOO · BOISE</div><div class="eyebrow">Customer waitlist</div><h1>Join the line</h1><p class="intro">Choose your service and enter your details.</p>
+<div id="closed" class="notice hidden">The waitlist is currently closed. Please check with the shop.</div>
+<section id="formSection"><h2>Select service</h2><div class="options" id="options" role="group" aria-label="Select service">
+<button type="button" class="option" aria-pressed="false" data-service="Buddy piercings"><span class="symbol">BP</span><span class="copy"><span class="name">Buddy piercings</span><span class="desc">$10 per person, groups of 2 or more</span></span><span class="check"></span></button>
+<button type="button" class="option" aria-pressed="false" data-service="Custom tattoo"><span class="symbol">✍</span><span class="copy"><span class="name">Custom tattoo</span><span class="desc">Any tattoo that is not on the wall or a GWYG game</span></span><span class="check"></span></button>
+<button type="button" class="option" aria-pressed="false" data-service="Get what you get games"><span class="symbol">🎲</span><span class="copy"><span class="name">Get what you get games</span><span class="desc">We have 19 themed GWYG games at fixed price points</span></span><span class="check"></span></button>
+<button type="button" class="option" aria-pressed="false" data-service="Piercing"><span class="symbol">✦</span><span class="copy"><span class="name">Piercing</span><span class="desc">Lobes, conch, tragus, nostril, helix, nipples, navel and more</span></span><span class="check"></span></button>
+<button type="button" class="option" aria-pressed="false" data-service="Wall flash"><span class="symbol">⚡</span><span class="copy"><span class="name">Wall flash</span><span class="desc">All wall flash 1/2 off our regular rates</span></span><span class="check"></span></button></div>
+<form id="joinForm"><div class="fields"><label for="customer-name">Your name</label><input id="customer-name" autocomplete="name" placeholder="First name and last initial" maxlength="80" required><label for="phone">Phone number</label><input id="phone" type="tel" autocomplete="tel" inputmode="tel" placeholder="(208) 555-0123" required><label for="party">How many in your party?</label><select id="party" required><option value="">Select party size</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option></select></div><button class="submit" id="join" type="submit" disabled>Connecting…</button><p class="error" id="error" role="alert"></p></form></section>
+<section id="result" class="success hidden" aria-live="polite"><h2>You're on the list!</h2><p>Your signup was received.</p><p id="status">Please check with the shop for your current position.</p></section><p class="foot">One signup per party. One signup per party. Queue position is available from the shop.</p></main>
+<script type="module">
+import {initializeApp} from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js';
+import {getAuth,signInAnonymously} from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js';
+import {getFirestore,collection,doc,addDoc,serverTimestamp,onSnapshot,query,orderBy,getDoc} from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js';
+// Firebase web configuration (not a secret).
+const firebaseConfig = {
+  apiKey: "AIzaSyCMukJqqHGwv8TO9gVxqxDiVnsV0Bzl4zk",
+  authDomain: "waitlist-9cc98.firebaseapp.com",
+  projectId: "waitlist-9cc98",
+  storageBucket: "waitlist-9cc98.firebasestorage.app",
+  messagingSenderId: "682598756147",
+  appId: "1:682598756147:web:49b7fb8802e108fc075846",
+  measurementId: "G-26X80FDKGV"
+};
+const $=id=>document.getElementById(id);
 const buttons=[...document.querySelectorAll('.option')];
-buttons.forEach(button=>button.addEventListener('click',()=>{buttons.forEach(other=>{const selected=other===button;other.setAttribute('aria-pressed',String(selected));other.querySelector('.check').textContent=selected?'✓':'';});}));
-</script>
-</body>
-</html>
+let selected='',open=false,ready=false,submitted=false;
+buttons.forEach(b=>b.addEventListener('click',()=>{
+  selected=b.dataset.service;
+  buttons.forEach(x=>{const yes=x===b;x.setAttribute('aria-pressed',String(yes));x.querySelector('.check').textContent=yes?'✓':'';});
+}));
+function error(message){$('error').textContent=message;}
+async function start(){
+  try {
+    const app=initializeApp(firebaseConfig), auth=getAuth(app), db=getFirestore(app);
+    await signInAnonymously(auth);
+    ready=true;
+    onSnapshot(doc(db,'settings','waitlist'),snap=>{
+      open=snap.exists()&&snap.data().open===true;
+      $('closed').classList.toggle('hidden',open||submitted);
+      if(!submitted)$('formSection').classList.toggle('hidden',!open);
+      $('join').disabled=!open||submitted;
+      $('join').textContent=open?'Join waitlist':'Waitlist closed';
+    },e=>error('Unable to check if the waitlist is open: '+e.message));
+    $('joinForm').addEventListener('submit',async e=>{
+      e.preventDefault();if(!ready||!open||submitted)return;
+      const name=$('customer-name').value.trim(),phone=$('phone').value.trim(),party=Number($('party').value);
+      if(!selected)return error('Please choose a service.');
+      if(!name||!/^[+\d\s().-]{7,20}$/.test(phone))return error('Please enter a name and valid phone number.');
+      if(!Number.isInteger(party)||party<1||party>6)return error('Please choose a party size from 1 to 6.');
+      if(selected==='Buddy piercings'&&party<2)return error('Buddy piercings requires at least 2 people.');
+      $('join').disabled=true;$('join').textContent='Joining…';error('');
+      try {
+        const settings=await getDoc(doc(db,'settings','waitlist'));
+        if(!settings.exists()||settings.data().open!==true)throw new Error('The waitlist is closed.');
+        await addDoc(collection(db,'waitlist'),{name,phone,partySize:party,service:selected,status:'waiting',createdAt:serverTimestamp()});
+        submitted=true;
+        $('formSection').classList.add('hidden');$('closed').classList.add('hidden');$('result').classList.remove('hidden');
+        $('status').textContent='You are checked in. Please check with the shop for your current position.';
+      }catch(ex){error('Could not join: '+ex.message);$('join').disabled=!open;$('join').textContent='Join waitlist';}
+    });
+  }catch(e){error('Connection error: '+e.message);$('join').textContent='Connection failed';}
+}
+start();
+</script></body></html>
