@@ -10,21 +10,283 @@
 <button id="join" type="submit" disabled>Join waitlist</button></form><p class="error" id="joinError" role="alert"></p></section>
 <section class="card hidden" id="visit"><h1>You're on the list!</h1><p id="visitDetails"></p><p>Your current position in line:</p><div class="big" id="position">—</div><p id="visitStatus">Updating your position…</p><p class="notice">Stay within 15–30 minutes of the shop. Staff will contact you manually when it's your turn.</p><button class="danger" id="cancel">Cancel my spot</button><p class="error" id="visitError" role="alert"></p></section>
 <p class="muted" style="text-align:center">One signup per party. <a href="admin.html">Staff dashboard</a></p></main>
+
 <script type="module">
 import {initializeApp} from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js';
 import {getAuth,signInAnonymously,onAuthStateChanged} from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js';
-import {getFirestore,doc,collection,onSnapshot,serverTimestamp,writeBatch} from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js';
-const cfg={apiKey:'AIzaSyCMukJqqHGwv8TO9gVxqxDiVnsV0Bzl4zk',authDomain:'waitlist-9cc98.firebaseapp.com',projectId:'waitlist-9cc98',storageBucket:'waitlist-9cc98.firebasestorage.app',messagingSenderId:'682598756147',appId:'1:682598756147:web:49b7fb8802e108fc075846',measurementId:'G-26X80FDKGV'};
-const app=initializeApp(cfg),auth=getAuth(app),db=getFirestore(app),$=id=>document.getElementById(id);
-let open=false,ready=false,user=null,queue=[],myId=localStorage.getItem('walkin_waitlist_id'),unsubMine=null;
-function error(e){return e?.message||String(e)}
-function showVisit(){ $('signup').classList.add('hidden');$('visit').classList.remove('hidden') }
-function showSignup(){ $('visit').classList.add('hidden');$('signup').classList.remove('hidden') }
-function updatePosition(){if(!myId)return;const i=queue.findIndex(d=>d.id===myId);$('position').textContent=i<0?'—':String(i+1);$('visitStatus').textContent=i<0?'Checking your spot…':`You are #${i+1} of ${queue.length} waiting parties.`}
-function watchMine(){if(unsubMine)unsubMine();if(!myId||!user)return;unsubMine=onSnapshot(doc(db,'waitlist',myId),snap=>{if(!snap.exists()){localStorage.removeItem('walkin_waitlist_id');myId=null;showSignup();return}const d=snap.data();if(d.ownerUid&&d.ownerUid!==user.uid){localStorage.removeItem('walkin_waitlist_id');myId=null;showSignup();return}if(d.status!=='waiting'){$('position').textContent='—';$('visitStatus').textContent=d.status==='completed'?'Your visit has been completed.':'Your spot has been removed.';$('cancel').classList.add('hidden');return}showVisit();$('visitDetails').textContent=`${d.service||'Visit'} · Party of ${d.partySize||1}`;updatePosition()},e=>{$('visitError').textContent='Unable to load your visit: '+error(e)})}
-onSnapshot(doc(db,'settings','waitlist'),snap=>{ready=true;open=snap.exists()&&snap.data().open===true;$('availability').textContent=open?'OPEN — customers can join':'CLOSED — please check with the shop';$('join').disabled=!open||!user},e=>{$('availability').textContent='Unable to check availability';$('joinError').textContent=error(e);$('join').disabled=true});
-onSnapshot(collection(db,'publicQueue'),snap=>{queue=snap.docs.filter(d=>d.data().status!=='cancelled'&&d.data().status!=='completed').sort((a,b)=>{const x=a.data().createdAt?.seconds??Infinity,y=b.data().createdAt?.seconds??Infinity;return x-y||a.id.localeCompare(b.id)});updatePosition()},e=>{$('visitError').textContent='Unable to update position: '+error(e)});
-onAuthStateChanged(auth,u=>{if(u){user=u;$('join').disabled=!ready||!open;if(myId)watchMine()}else{signInAnonymously(auth).catch(e=>{$('joinError').textContent='Unable to connect: '+error(e)})}});
-$('form').addEventListener('submit',async e=>{e.preventDefault();if(!open||!user)return;$('join').disabled=true;$('joinError').textContent='';try{const name=$('name').value.trim(),phone=$('phone').value.trim(),service=$('service').value,partySize=Number($('party').value);if(!name||!phone||!service||partySize<1||partySize>6)throw Error('Please complete all required fields.');const payload={name,phone,service,partySize,ownerUid:user.uid,status:'waiting',createdAt:serverTimestamp()};const batch=writeBatch(db);batch.set(doc(db,'waitlist',user.uid),payload);batch.set(doc(db,'publicQueue',user.uid),{ownerUid:user.uid,createdAt:serverTimestamp()});await batch.commit();myId=user.uid;localStorage.setItem('walkin_waitlist_id',myId);showVisit();watchMine()}catch(e){$('joinError').textContent=error(e)}finally{$('join').disabled=!open||!user}});
-$('cancel').addEventListener('click',async()=>{if(!myId||!user||!confirm('Remove your party from the waitlist?'))return;$('cancel').disabled=true;$('visitError').textContent='';try{const batch=writeBatch(db);batch.update(doc(db,'waitlist',myId),{status:'cancelled'});batch.delete(doc(db,'publicQueue',myId));await batch.commit();localStorage.removeItem('walkin_waitlist_id');myId=null;if(unsubMine)unsubMine();$('cancel').classList.remove('hidden');showSignup()}catch(e){$('visitError').textContent='Could not cancel: '+error(e)}finally{$('cancel').disabled=false}});
+import {getFirestore,doc,collection,onSnapshot,serverTimestamp,writeBatch,getDoc} from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js';
+
+const cfg={
+  apiKey:'AIzaSyCMukJqqHGwv8TO9gVxqxDiVnsV0Bzl4zk',
+  authDomain:'waitlist-9cc98.firebaseapp.com',
+  projectId:'waitlist-9cc98',
+  storageBucket:'waitlist-9cc98.firebasestorage.app',
+  messagingSenderId:'682598756147',
+  appId:'1:682598756147:web:49b7fb8802e108fc075846',
+  measurementId:'G-26X80FDKGV'
+};
+
+const app=initializeApp(cfg);
+const auth=getAuth(app);
+const db=getFirestore(app);
+const $=id=>document.getElementById(id);
+
+let open=false;
+let ready=false;
+let user=null;
+let queue=[];
+let myId=localStorage.getItem('walkin_waitlist_id');
+let unsubMine=null;
+let unsubSettings=null;
+let unsubQueue=null;
+let submitting=false;
+
+const error=e=>e?.message||String(e);
+
+function showVisit(){
+  $('signup').classList.add('hidden');
+  $('visit').classList.remove('hidden');
+}
+
+function showSignup(){
+  $('visit').classList.add('hidden');
+  $('signup').classList.remove('hidden');
+}
+
+function enableJoin(){
+  $('join').disabled=!ready||!open||!user||submitting;
+}
+
+function updatePosition(){
+  if(!myId)return;
+  const i=queue.findIndex(d=>d.id===myId);
+  $('position').textContent=i<0?'—':String(i+1);
+  $('visitStatus').textContent=i<0?
+    'Checking your spot…':
+    `You are #${i+1} of ${queue.length} waiting parties.`;
+}
+
+function stopMine(){
+  if(unsubMine){
+    unsubMine();
+    unsubMine=null;
+  }
+}
+
+function clearSpot(){
+  stopMine();
+  localStorage.removeItem('walkin_waitlist_id');
+  myId=null;
+  $('cancel').classList.remove('hidden');
+  showSignup();
+}
+
+function watchMine(){
+  stopMine();
+  if(!myId||!user)return;
+
+  const id=myId;
+
+  unsubMine=onSnapshot(
+    doc(db,'waitlist',id),
+    snap=>{
+      if(id!==myId)return;
+
+      if(!snap.exists()){
+        clearSpot();
+        return;
+      }
+
+      const d=snap.data();
+
+      if(d.ownerUid!==user.uid||d.status!=='waiting'){
+        clearSpot();
+        return;
+      }
+
+      showVisit();
+      $('visitDetails').textContent=
+        `${d.service||'Visit'} · Party of ${d.partySize||1}`;
+      updatePosition();
+    },
+    e=>{
+      $('visitError').textContent=
+        'Unable to load your visit: '+error(e);
+    }
+  );
+}
+
+function startListeners(){
+  if(unsubSettings)unsubSettings();
+  if(unsubQueue)unsubQueue();
+
+  unsubSettings=onSnapshot(
+    doc(db,'settings','waitlist'),
+    snap=>{
+      ready=true;
+      open=snap.exists()&&snap.data().open===true;
+      $('availability').textContent=open?
+        'OPEN — customers can join':
+        'CLOSED — please check with the shop';
+      enableJoin();
+    },
+    e=>{
+      ready=false;
+      $('availability').textContent='Unable to check availability';
+      $('joinError').textContent=error(e);
+      enableJoin();
+    }
+  );
+
+  unsubQueue=onSnapshot(
+    collection(db,'publicQueue'),
+    snap=>{
+      queue=snap.docs.sort((a,b)=>{
+        const x=a.data().createdAt?.seconds??Infinity;
+        const y=b.data().createdAt?.seconds??Infinity;
+        return x-y||a.id.localeCompare(b.id);
+      });
+      updatePosition();
+    },
+    e=>{
+      $('joinError').textContent=
+        'Unable to load the queue: '+error(e);
+    }
+  );
+
+  if(myId)watchMine();
+}
+
+onAuthStateChanged(auth,async u=>{
+  if(u){
+    user=u;
+    enableJoin();
+    startListeners();
+    return;
+  }
+
+  user=null;
+  ready=false;
+  enableJoin();
+
+  if(unsubSettings){
+    unsubSettings();
+    unsubSettings=null;
+  }
+
+  if(unsubQueue){
+    unsubQueue();
+    unsubQueue=null;
+  }
+
+  stopMine();
+
+  try{
+    await signInAnonymously(auth);
+  }catch(e){
+    $('joinError').textContent=
+      'Unable to connect: '+error(e);
+  }
+});
+
+$('form').addEventListener('submit',async e=>{
+  e.preventDefault();
+
+  if(!ready||!open||!user||submitting)return;
+
+  submitting=true;
+  enableJoin();
+  $('joinError').textContent='';
+
+  try{
+    const name=$('name').value.trim();
+    const phone=$('phone').value.trim();
+    const service=$('service').value;
+    const partySize=Number($('party').value);
+
+    if(!name||!phone||!service||
+       !Number.isInteger(partySize)||
+       partySize<1||partySize>6){
+      throw Error('Please complete all required fields.');
+    }
+
+    if(service==='Buddy piercings'&&partySize<2){
+      throw Error('Buddy piercings requires a party of at least 2.');
+    }
+
+    if(phone.length<7||phone.length>20){
+      throw Error('Please enter a valid phone number (7–20 characters).');
+    }
+
+    const existing=await getDoc(doc(db,'waitlist',user.uid));
+
+    if(existing.exists()&&existing.data().status==='waiting'){
+      myId=user.uid;
+      localStorage.setItem('walkin_waitlist_id',myId);
+      watchMine();
+      showVisit();
+      return;
+    }
+
+    const payload={
+      name,
+      phone,
+      service,
+      partySize,
+      ownerUid:user.uid,
+      status:'waiting',
+      createdAt:serverTimestamp()
+    };
+
+    const batch=writeBatch(db);
+
+    batch.set(doc(db,'waitlist',user.uid),payload);
+
+    batch.set(doc(db,'publicQueue',user.uid),{
+      ownerUid:user.uid,
+      createdAt:serverTimestamp()
+    });
+
+    await batch.commit();
+
+    myId=user.uid;
+    localStorage.setItem('walkin_waitlist_id',myId);
+    showVisit();
+    watchMine();
+
+  }catch(err){
+    $('joinError').textContent=error(err);
+  }finally{
+    submitting=false;
+    enableJoin();
+  }
+});
+
+$('cancel').addEventListener('click',async()=>{
+  if(!myId||!user||
+     !confirm('Remove your party from the waitlist?'))return;
+
+  $('cancel').disabled=true;
+  $('visitError').textContent='';
+
+  try{
+    const batch=writeBatch(db);
+
+    batch.update(doc(db,'waitlist',myId),{
+      status:'cancelled'
+    });
+
+    batch.delete(doc(db,'publicQueue',myId));
+
+    await batch.commit();
+    clearSpot();
+
+  }catch(e){
+    $('visitError').textContent=
+      'Could not cancel: '+error(e);
+  }finally{
+    $('cancel').disabled=false;
+  }
+});
+
 </script></body></html>
